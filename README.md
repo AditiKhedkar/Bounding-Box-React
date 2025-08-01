@@ -14,10 +14,6 @@ Think of it like drawing boxes around things in a photo and writing notes about 
 
 ## Getting Started
 
-### What you need
-- A computer with internet access
-- Node.js installed (download from nodejs.org)
-- A code editor (VS Code is recommended)
 
 ### Setting up the project
 
@@ -90,17 +86,6 @@ src/
 
 ## Customizing the tool
 
-### Adding new label options
-
-Edit the `annotationItems` array in `BoundingBoxApp.tsx`:
-
-```typescript
-const annotationItems = [
-  'Your Custom Label',
-  'Another Label',
-  // Add more here
-];
-```
 
 ### Using different images
 
@@ -166,11 +151,3 @@ Want to improve this tool? Great! Here's how:
 2. Make your changes
 3. Test them thoroughly
 4. Submit a pull request with a clear description
-
-## License
-
-This project is open source under the MIT License. Feel free to use it for any purpose.
-
----
-
-*This tool was built to make image annotation simple and accessible. Whether you're a researcher, developer, or just someone who needs to label images, we hope it serves you well.*
