@@ -129,15 +129,6 @@ npm run build
 
 This creates a `dist` folder with files you can upload to any web hosting service.
 
-## What's next?
-
-Some ideas for improvements:
-- Support for multiple images
-- Keyboard shortcuts for faster annotation
-- Different box colors for different label types
-- Undo/redo functionality
-- Zoom and pan for detailed work
-- Export to different file formats
 
 ## Getting help
 
@@ -147,10 +138,4 @@ If something isn't working:
 3. Try restarting the development server
 4. Check that your Node.js version is up to date
 
-## Contributing
 
-Want to improve this tool? Great! Here's how:
-1. Fork the repository
-2. Make your changes
-3. Test them thoroughly
-4. Submit a pull request with a clear description
