@@ -8,6 +8,7 @@ interface BoundingBox {
   width: number;
   height: number;
   label: string;
+  thumbnail?: string;
 }
 
 interface Point {
@@ -40,6 +41,7 @@ const BoundingBoxApp: React.FC = () => {
   const [currentBox, setCurrentBox] = useState<Omit<BoundingBox, 'id' | 'label'> | null>(null);
   const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null);
   const [newLabel, setNewLabel] = useState('');
+  const [thumbnails, setThumbnails] = useState<{[key: string]: string}>({});
   
   const imageRef = useRef<HTMLDivElement>(null);
 
@@ -118,24 +120,92 @@ const BoundingBoxApp: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    const annotationData = {
-      image: "steering-column-image",
-      annotations: boundingBoxes.map(box => ({
-        id: box.id,
-        label: box.label,
-        coordinates: {
-          x: box.x,
-          y: box.y,
-          width: box.width,
-          height: box.height
+  const generateThumbnail = async (box: BoundingBox): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // Set thumbnail size
+        const thumbnailSize = 80;
+        canvas.width = thumbnailSize;
+        canvas.height = thumbnailSize;
+        
+        if (!ctx) {
+          resolve('');
+          return;
         }
-      })),
-      timestamp: new Date().toISOString()
+        
+        // Calculate scaling to fit the bounding box area into thumbnail
+        const scaleX = thumbnailSize / box.width;
+        const scaleY = thumbnailSize / box.height;
+        const scale = Math.min(scaleX, scaleY);
+        
+        const scaledWidth = box.width * scale;
+        const scaledHeight = box.height * scale;
+        const offsetX = (thumbnailSize - scaledWidth) / 2;
+        const offsetY = (thumbnailSize - scaledHeight) / 2;
+        
+        // Fill background
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, 0, thumbnailSize, thumbnailSize);
+        
+        // Draw the cropped and scaled image
+        ctx.drawImage(
+          img,
+          box.x, box.y, box.width, box.height, // Source rectangle
+          offsetX, offsetY, scaledWidth, scaledHeight // Destination rectangle
+        );
+        
+        // Add border
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, thumbnailSize - 2, thumbnailSize - 2);
+        
+        resolve(canvas.toDataURL());
+      };
+      
+      img.onerror = () => resolve('');
+      img.src = 'https://images.pexels.com/photos/190537/pexels-photo-190537.jpeg?auto=compress&cs=tinysrgb&w=600';
+    });
+  };
+
+  const handleSubmit = () => {
+    // Generate thumbnails for all bounding boxes
+    const generateAllThumbnails = async () => {
+      const newThumbnails: {[key: string]: string} = {};
+      
+      for (const box of boundingBoxes) {
+        const thumbnail = await generateThumbnail(box);
+        newThumbnails[box.id] = thumbnail;
+      }
+      
+      setThumbnails(newThumbnails);
+      
+      // Prepare annotation data with thumbnails
+      const annotationData = {
+        image: "steering-column-image",
+        annotations: boundingBoxes.map(box => ({
+          id: box.id,
+          label: box.label,
+          coordinates: {
+            x: box.x,
+            y: box.y,
+            width: box.width,
+            height: box.height
+          },
+          thumbnail: newThumbnails[box.id]
+        })),
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Submitting annotations with thumbnails:', annotationData);
+      alert(`Submitted ${boundingBoxes.length} annotations with thumbnails successfully!`);
     };
     
-    console.log('Submitting annotations:', annotationData);
-    alert(`Submitted ${boundingBoxes.length} annotations successfully!`);
+    generateAllThumbnails();
   };
 
   return (
@@ -216,9 +286,23 @@ const BoundingBoxApp: React.FC = () => {
         
         {/* Bottom Thumbnails */}
         <div className="flex mt-4 space-x-2">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-20 h-16 bg-gray-600 rounded"></div>
+          {Object.entries(thumbnails).map(([boxId, thumbnail]) => (
+            <div key={boxId} className="relative">
+              <img 
+                src={thumbnail} 
+                alt={`Thumbnail for ${boundingBoxes.find(b => b.id === boxId)?.label}`}
+                className="w-20 h-20 bg-gray-600 rounded border-2 border-blue-500 object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-1 rounded-b truncate">
+                {boundingBoxes.find(b => b.id === boxId)?.label}
+              </div>
+            </div>
           ))}
+          {Object.keys(thumbnails).length === 0 && (
+            <div className="text-gray-500 text-sm py-4">
+              Thumbnails will appear here after clicking SUBMIT
+            </div>
+          )}
         </div>
       </div>
 
