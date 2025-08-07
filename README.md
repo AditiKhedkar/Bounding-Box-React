@@ -9,6 +9,7 @@ A simple web application for drawing and labeling rectangular annotations on ima
 
 This tool lets you:
 - Draw rectangular boxes around objects in images
+- the thumbnails will be captured
 - Add labels to describe what's in each box
 - Export your annotations as structured data
 - Edit or delete annotations as needed
