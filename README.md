@@ -10,7 +10,11 @@ camera functionality
 
 
 
-
+### 🖼️ **Smart Thumbnails**
+- Generate preview thumbnails of annotated regions
+- Visual confirmation of what you've labeled
+- Export thumbnails with annotation data
+- Perfect for dataset review and validation
 
 
 https://strong-cucurucho-f8832e.netlify.app/
