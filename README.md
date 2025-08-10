@@ -28,7 +28,10 @@ This tool lets you:
 - Edit or delete annotations as needed
 
 Think of it like drawing boxes around things in a photo and writing notes about what each box contains.
-
+Camera Features
+Detailed instructions for taking photos
+Camera permission and troubleshooting
+Mobile and desktop compatibility
 ## Getting Started
 
 
