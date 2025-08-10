@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Camera } from 'lucide-react';
 
 interface BoundingBox {
   id: string;
@@ -42,15 +42,58 @@ const BoundingBoxApp: React.FC = () => {
   const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null);
   const [newLabel, setNewLabel] = useState('');
   const [thumbnails, setThumbnails] = useState<{[key: string]: string}>({});
+  const [currentImage, setCurrentImage] = useState('https://images.pexels.com/photos/190537/pexels-photo-190537.jpeg?auto=compress&cs=tinysrgb&w=600');
+  const [showCamera, setShowCamera] = useState(false);
   
   const imageRef = useRef<HTMLDivElement>(null);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const annotationItems = [
     'Stub Shaft in U Joint',
     'Cross Pinch Bolt',
     'U Joint',
     'Steering Column'
   ];
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } // Use back camera if available
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setShowCamera(true);
+      }
+    } catch (error) {
+      alert('Camera access denied or not available');
+    }
+  };
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        const imageDataUrl = canvas.toDataURL('image/jpeg');
+        setCurrentImage(imageDataUrl);
+        stopCamera();
+      }
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+    setShowCamera(false);
+  };
 
   const getMousePosition = (e: React.MouseEvent): Point => {
     if (!imageRef.current) return { x: 0, y: 0 };
@@ -168,7 +211,7 @@ const BoundingBoxApp: React.FC = () => {
       };
       
       img.onerror = () => resolve('');
-      img.src = 'https://images.pexels.com/photos/190537/pexels-photo-190537.jpeg?auto=compress&cs=tinysrgb&w=600';
+      img.src = currentImage;
     });
   };
 
@@ -212,18 +255,59 @@ const BoundingBoxApp: React.FC = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Main Image Area */}
       <div className="flex-1 p-4">
+        {/* Camera Controls */}
+        <div className="mb-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Image Annotation</h2>
+          <div className="flex space-x-2">
+            {!showCamera ? (
+              <button
+                onClick={startCamera}
+                className="bg-green-500 text-white px-4 py-2 rounded flex items-center space-x-2 hover:bg-green-600 transition-colors"
+              >
+                <Camera size={16} />
+                <span>Take Photo</span>
+              </button>
+            ) : (
+              <div className="flex space-x-2">
+                <button
+                  onClick={captureImage}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                >
+                  Capture
+                </button>
+                <button
+                  onClick={stopCamera}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div 
           ref={imageRef}
           className="relative w-full h-96 bg-gray-800 cursor-crosshair overflow-hidden"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
-          style={{
-            backgroundImage: 'url("https://images.pexels.com/photos/190537/pexels-photo-190537.jpeg?auto=compress&cs=tinysrgb&w=600")',
+          style={!showCamera ? {
+            backgroundImage: `url("${currentImage}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
-          }}
+          } : {}}
         >
+          {/* Camera View */}
+          {showCamera && (
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          )}
+          
           {/* Existing Bounding Boxes */}
           {boundingBoxes.map(box => (
             <div key={box.id}>
@@ -283,6 +367,9 @@ const BoundingBoxApp: React.FC = () => {
             />
           )}
         </div>
+        
+        {/* Hidden canvas for image capture */}
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
         
         {/* Bottom Thumbnails */}
         <div className="flex mt-4 space-x-2">
