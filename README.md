@@ -2,7 +2,12 @@
 <img width="1311" height="569" alt="image" src="https://github.com/user-attachments/assets/f9965d37-d3ca-4613-908e-2b4498996543" />
 <img width="629" height="341" alt="image" src="https://github.com/user-attachments/assets/309d7728-a084-4edd-b1c2-e89bac89dcc3" />
 commit changes 
+<img width="709" height="496" alt="image" src="https://github.com/user-attachments/assets/737dd55e-a483-40e6-8172-e174ea2c6b13" />
+
+camera functionality
 ![Uploading image.png…]()
+
+
 
 
 
