@@ -20,7 +20,7 @@ camera functionality
 https://strong-cucurucho-f8832e.netlify.app/
 # Bounding Box Annotation Tool
 
-A simple web application for drawing and labeling rectangular annotations on images. Perfect for creating training data for machine learning models or documenting image contents.
+A modern web application for creating image annotations with bounding boxes. Perfect for machine learning datasets, object detection training, or visual documentation. Now with built-in camera support for instant image capture!
 
 ## What does this do?
 
