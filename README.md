@@ -5,7 +5,9 @@ commit changes
 <img width="709" height="496" alt="image" src="https://github.com/user-attachments/assets/737dd55e-a483-40e6-8172-e174ea2c6b13" />
 
 camera functionality
+<img width="563" height="140" alt="image" src="https://github.com/user-attachments/assets/0e7e6ce0-06e4-4b6c-b041-8073b290eaee" />
 ![Uploading image.png…]()
+
 
 
 
